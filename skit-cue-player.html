@@ -357,7 +357,7 @@ function load(text,name,handle){
     project={title:d.title||"",scenes:d.scenes};F.handle=handle||null;F.name=name;F.dirty=false;render();fileUI()}
   catch{alert('This file is not a Skit Cue Player project.')}
 }
-async function open(){
+async function openFile(){
   if(F.dirty&&!confirm('Discard unsaved changes and open another show?'))return;
   if('showOpenFilePicker' in window){
     try{const[h]=await showOpenFilePicker({types});const f=await h.getFile();load(await f.text(),f.name,h)}
@@ -366,7 +366,7 @@ async function open(){
 }
 $('exportBtn').onclick=()=>save(false);
 $('saveAsBtn').onclick=()=>save(true);
-$('importBtn').onclick=open;
+$('importBtn').onclick=openFile;
 $('importFile').onchange=async e=>{const f=e.target.files[0];if(f)load(await f.text(),f.name);e.target.value=''};
 // drag & drop a .json onto the editor
 addEventListener('dragover',e=>{if($('editor').style.display!=='none'){e.preventDefault();document.body.classList.add('drag')}});
@@ -389,9 +389,9 @@ html,body{margin:0;width:100%;height:100%;background:#000;overflow:hidden;cursor
 #hint{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);color:#fff;font:15px system-ui;background:rgba(0,0,0,.75);padding:10px 16px;border-radius:8px;transition:opacity .5s;pointer-events:none;cursor:default}
 </style></head><body>
 <div class="bg" id="bgA"></div><div class="bg" id="bgB" style="opacity:0"></div><div id="dim"></div>
-<div id="hint">Click anywhere on this screen once to go fullscreen</div>
+<div id="hint">Click anywhere in this window to show it fullscreen on the audience screen</div>
 <script>
-let front='bgA',cur;
+let front='bgA',cur,SD=null;
 function setView(src,dim,fade){
   if(src!==cur){cur=src;const back=front==='bgA'?'bgB':'bgA',b=document.getElementById(back),f=document.getElementById(front);
     b.style.transition=f.style.transition='opacity '+(fade==null?.9:fade)+'s';
@@ -399,27 +399,61 @@ function setView(src,dim,fade){
   document.getElementById('dim').style.opacity=dim;
 }
 const hint=document.getElementById('hint');
-function full(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{})}
+const WM='getScreenDetails' in window;
+/* the screen the presenter window is NOT on (prefers an external one) */
+function target(sd){
+  let others=sd.screens.filter(s=>s!==sd.currentScreen);
+  try{const p={x:opener.screenX+opener.outerWidth/2,y:opener.screenY+opener.outerHeight/2};
+    others=sd.screens.filter(s=>!(p.x>=s.left&&p.x<s.left+s.width&&p.y>=s.top&&p.y<s.top+s.height))}catch(e){}
+  return others.find(s=>!s.isInternal)||others[0]||null;
+}
+(async()=>{if(!WM)return;try{const st=await navigator.permissions.query({name:'window-management'});
+  if(st.state==='granted'){SD=await getScreenDetails();if(SD.screens.length<2)hint.textContent='Only one screen detected. Press Win+P and choose Extend (Mac: Displays settings, turn off Mirror), then click here.'}}catch(e){}})();
+async function full(){
+  if(document.fullscreenElement)return;
+  const el=document.documentElement;let t=null;
+  try{if(WM){SD=SD||await getScreenDetails();t=target(SD)}}catch(e){}
+  /* {screen} sends the fullscreen straight to the projector/TV, wherever this window currently is */
+  (t?el.requestFullscreen({screen:t}):el.requestFullscreen()).catch(()=>el.requestFullscreen().catch(()=>{}));
+}
+if(!WM)hint.textContent='Drag this window onto the projector/TV screen (Windows: Win+Shift+Arrow), then click anywhere in it to go fullscreen';
 addEventListener('click',full);
 addEventListener('dblclick',()=>document.fullscreenElement?document.exitFullscreen():full());
 document.addEventListener('fullscreenchange',()=>hint.style.opacity=document.fullscreenElement?0:1);
 addEventListener('keydown',e=>{if(e.key==='Escape')return;full();opener&&opener.presenterKey&&opener.presenterKey(e)});
 opener&&opener.syncAud&&opener.syncAud(true);
 <\/script></body></html>`;
+/* Multi-screen placement (Chrome/Edge "window management" permission, asked once) */
+const WM='getScreenDetails' in window;let SD=null;
+async function getScreens(ask){
+  if(!WM)return null;
+  try{if(!ask){const st=await navigator.permissions.query({name:'window-management'});if(st.state!=='granted')return null}
+    SD=await getScreenDetails();SD.onscreenschange=audUI}catch(e){SD=null}
+  audUI();return SD;
+}
+getScreens(false); // already allowed earlier? then the first click can open straight onto the 2nd screen
+function extScreen(){ // any screen other than the one this presenter window is on
+  if(!SD)return null;const c=SD.currentScreen;
+  const o=SD.screens.filter(s=>s!==c&&!(s.left===c.left&&s.top===c.top));
+  return o.find(s=>!s.isInternal)||o[0]||null;
+}
+function placeAud(){
+  const s=extScreen();if(!s||!aud||aud.closed)return;
+  try{aud.moveTo(s.availLeft,s.availTop);aud.resizeTo(s.availWidth,s.availHeight)}catch(e){}
+}
 function openAudience(){
-  if(aud&&!aud.closed){aud.focus();syncAud(true);return}
-  // open immediately (inside the click) so the browser doesn't block it
-  aud=window.open('','skitAudience','popup,width=960,height=540');
+  if(aud&&!aud.closed){placeAud();aud.focus();syncAud(true);return}
+  // open immediately (inside the click) so the browser doesn't block it; if we already know the screens, open it right on the 2nd one
+  const s=extScreen();
+  aud=window.open('','skitAudience',s?`popup,left=${s.availLeft},top=${s.availTop},width=${s.availWidth},height=${s.availHeight}`:'popup,width=960,height=540');
   if(!aud){alert('The browser blocked the audience window. Allow pop-ups for this page, then press the button again.');return}
   aud.document.open();aud.document.write(AUD_HTML);aud.document.close();
   syncAud(true);audUI();
-  // then move it onto the other monitor (Chrome/Edge, needs the "window management" permission once)
-  if('getScreenDetails' in window)getScreenDetails().then(sd=>{
-    const o=sd.screens.find(x=>x!==sd.currentScreen);
-    if(o&&aud&&!aud.closed){aud.moveTo(o.availLeft,o.availTop);aud.resizeTo(o.availWidth,o.availHeight)}
-  }).catch(()=>{});
+  if(s)placeAud();else getScreens(true).then(sd=>{
+    if(sd&&sd.screens.length<2)alert('Only one screen is detected, so the audience window cannot go to the projector/TV.\n\nWindows: press Win+P and choose "Extend" (not Duplicate).\nMac: System Settings > Displays, turn off mirroring.\n\nThen press "Show audience window" again.');
+    placeAud();
+  });
 }
-window.syncAud=(...a)=>syncAud(...a);
 function syncAud(){
   try{if(!aud||aud.closed||!aud.setView)return;
     if($('player').style.display!=='flex'||P.blank)aud.setView(null,1,0);
@@ -427,7 +461,9 @@ function syncAud(){
 }
 setInterval(syncAud,1000); // heartbeat: audience always catches up
 function audUI(){const on=aud&&!aud.closed;
-  $('audState').innerHTML=`<span class="dot ${on?'live':''}"></span>${on?'Audience screen connected':'No audience screen'}`;
+  const n=SD?SD.screens.length:0,s=extScreen();
+  $('audState').innerHTML=`<span class="dot ${on?'live':''}"></span>${on?'Audience screen connected':'No audience screen'}`+
+    (n===1?' · <b style="color:var(--danger)">only 1 display detected — set Extend (Win+P)</b>':s?` · ${esc(s.label||'2nd display')}: click the audience window once for fullscreen`:'');
   $('pAud').querySelector('span').textContent=on?'Show audience window':'Open audience screen'}
 setInterval(audUI,1000);
 addEventListener('beforeunload',()=>{if(aud&&!aud.closed&&!F.dirty)aud.close()});
