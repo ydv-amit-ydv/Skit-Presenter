@@ -50,6 +50,16 @@ body.drag #editor main{outline:3px dashed var(--accent);outline-offset:-10px}
 select{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:3px 6px;font:inherit}
 .lbl input[type=number]{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:2px 4px;color:var(--text)}
 .frame small{font-size:.7rem;color:var(--dim)}
+/* Audio trimmer */
+.trimmer{background:var(--bg);border:1px solid var(--accent);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:8px}
+.wave{width:100%;height:96px;display:block;cursor:ew-resize;border-radius:6px;background:var(--panel2);touch-action:none}
+.trow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:.85rem}
+.trow input[type=number]{width:76px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:4px 6px;color:var(--text)}
+.trow .btn{padding:6px 9px}.trow .btn.icon{padding:6px}
+.tlen{margin:0 auto;color:var(--dim);font-variant-numeric:tabular-nums}
+.tbadge{font-size:.72rem;color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums}
+.btn.on{border-color:var(--accent);color:var(--accent)}
+#msg{color:var(--accent);font-weight:600}
 .empty{color:var(--dim);text-align:center;padding:60px 20px;border:2px dashed var(--line);border-radius:14px}
 @media(max-width:680px){.scene{grid-template-columns:1fr}}
 /* Presenter console */
@@ -131,6 +141,7 @@ kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2p
  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
  <symbol id="i-dim" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor"/></symbol>
+<symbol id="i-cut" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></symbol>
  <symbol id="i-mask" viewBox="0 0 24 24"><path d="M3 5c3 1 6 1 9 0s6-1 9 0v5c0 6-4 10-9 10S3 16 3 10Z"/><path d="M8 10h2M14 10h2M9 15c2 1.5 4 1.5 6 0"/></symbol>
 </svg>
 
@@ -149,7 +160,7 @@ kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2p
   <input type="file" id="importFile" accept=".json" hidden>
 </header>
 <main>
-  <p class="help">Each scene has one background and an ordered list of audio cues. In the player, <kbd>Space</kbd> fires the next cue. Tick <b>auto</b> on a cue to have it start automatically when the previous one ends. The saved .json embeds all images and audio, so one file carries the whole show. To edit a saved show, select <b>Open</b> (or drop the .json onto this page), make changes, then <b>Save</b>.</p>
+  <p class="help">Each scene has one background and an ordered list of audio cues. In the player, <kbd>Space</kbd> fires the next cue. Use the ✂ button on a cue to trim its start and end (drag the edges on the waveform). Tick <b>auto</b> on a cue to have it start automatically when the previous one ends. The saved .json embeds all images, audio and trim points, so one file carries the whole show. To edit a saved show, select <b>Open</b> (or drop the .json onto this page), make changes, then <b>Save</b>.</p>
   <div id="scenes"></div>
 </main>
 </section>
@@ -165,7 +176,7 @@ kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2p
   </div>
   <div class="pmain">
     <div class="stageWrap">
-      <div class="cap"><span>Audience sees <span id="frameCap"></span></span><span id="dimCap"></span></div>
+      <div class="cap"><span>Audience sees <span id="frameCap"></span></span><span><span id="msg"></span> <span id="dimCap"></span></span></div>
       <div id="stage"><div class="bg" id="bgA"></div><div class="bg" id="bgB" style="opacity:0"></div><div id="dim"></div><div id="blankTag">AUDIENCE SCREEN BLANK</div></div>
     </div>
     <div class="side">
@@ -177,7 +188,7 @@ kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2p
   </div>
   <div id="hud">
     <div class="info"><span id="sceneInfo"></span><span id="cueInfo"></span><span id="nextInfo"></span></div>
-    <div id="prog"><span id="tCur">0:00</span><div id="bar" role="slider" aria-label="Seek" title="Click or drag to seek"><div></div></div><span id="tDur">0:00</span></div>
+    <div id="prog"><button class="btn skip" id="pIn" title="Trim: make this cue START here next time ([)">[ In here</button><span id="tCur">0:00</span><div id="bar" role="slider" aria-label="Seek" title="Click or drag to seek"><div></div></div><span id="tDur">0:00</span><button class="btn skip" id="pOut" title="Trim: make this cue END here (])">Out here ]</button></div>
     <div class="ctrls">
       <div class="group">
         <button class="btn icon" id="pPrevScene" title="Previous scene (PgUp)"><svg><use href="#i-sprev"/></svg></button>
@@ -198,7 +209,7 @@ kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2p
         <label class="vol" title="Volume"><svg><use href="#i-vol"/></svg><input type="range" id="vol" min="0" max="1" step="0.05" value="1"></label>
       </div>
     </div>
-    <div class="keys"><kbd>Space</kbd> GO/pause &nbsp; <kbd>Esc</kbd> stop &nbsp; <kbd>←</kbd><kbd>→</kbd> cue &nbsp; <kbd>Shift</kbd>+<kbd>←</kbd><kbd>→</kbd> ±5s &nbsp; <kbd>,</kbd><kbd>.</kbd> ±1s &nbsp; <kbd>PgUp</kbd><kbd>PgDn</kbd> scene &nbsp; <kbd>D</kbd> dim &nbsp; <kbd>B</kbd> blackout &nbsp; <kbd>A</kbd> audience screen &nbsp; <kbd>K</kbd> blank audience</div>
+    <div class="keys"><kbd>Space</kbd> GO/pause &nbsp; <kbd>Esc</kbd> stop &nbsp; <kbd>←</kbd><kbd>→</kbd> cue &nbsp; <kbd>Shift</kbd>+<kbd>←</kbd><kbd>→</kbd> ±5s &nbsp; <kbd>,</kbd><kbd>.</kbd> ±1s &nbsp; <kbd>PgUp</kbd><kbd>PgDn</kbd> scene &nbsp; <kbd>D</kbd> dim &nbsp; <kbd>B</kbd> blackout &nbsp; <kbd>A</kbd> audience screen &nbsp; <kbd>K</kbd> blank audience &nbsp; <kbd>[</kbd><kbd>]</kbd> trim in/out here &nbsp; <kbd>Ctrl</kbd>+<kbd>S</kbd> save</div>
   </div>
 </section>
 
@@ -215,7 +226,8 @@ const fmt=t=>isFinite(t)?`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStar
 
 /* ---------- THEME ---------- */
 function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('scp-theme',t)}catch{}
-  document.querySelectorAll('.themeBtn').forEach(b=>b.innerHTML=ico(t==='dark'?'sun':'moon'))}
+  document.querySelectorAll('.themeBtn').forEach(b=>b.innerHTML=ico(t==='dark'?'sun':'moon'));
+  document.querySelectorAll('canvas.wave').forEach(drawWave)}
 function toggleTheme(){setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark')}
 document.querySelectorAll('.themeBtn').forEach(b=>b.onclick=toggleTheme);
 try{setTheme(localStorage.getItem('scp-theme')||'dark')}catch{setTheme('dark')}
@@ -235,7 +247,75 @@ function cueDur(c){
   };
   a.src=c.src;return NaN;
 }
-function cueOffset(sc,k){let t=0;for(let i=0;i<k;i++){const d=cueDur(sc.cues[i]);if(isFinite(d))t+=d}return t}
+/* ---------- TRIM (saved in the .json as cue.trimStart / cue.trimEnd, in seconds) ---------- */
+const tIn=c=>c.trimStart||0;
+function tOut(c){const d=cueDur(c);return c.trimEnd>0?(isFinite(d)?Math.min(c.trimEnd,d):c.trimEnd):d}
+function cueLen(c){const o=tOut(c);return isFinite(o)?Math.max(0,o-tIn(c)):NaN} // playable (trimmed) length
+const fmtP=t=>isFinite(t)?`${Math.floor(t/60)}:${(t%60).toFixed(2).padStart(5,'0')}`:'–';
+const trimBadge=c=>c.trimStart||c.trimEnd?`✂ ${fmtP(tIn(c))} – ${c.trimEnd?fmtP(c.trimEnd):'end'}`:'';
+function setTrim(c,w,v){
+  const d=cueDur(c);
+  if(w==='in'){v=Math.max(0,+v||0);const o=tOut(c);if(isFinite(o))v=Math.min(v,o-0.1);
+    if(v>0.005)c.trimStart=+v.toFixed(2);else delete c.trimStart}
+  else if(v===''||v==null||!(+v>0))delete c.trimEnd;
+  else{v=Math.max(+v,tIn(c)+0.1);if(isFinite(d)&&v>=d-0.005)delete c.trimEnd;else c.trimEnd=+v.toFixed(2)}
+  markDirty();refreshTrim(c);
+}
+function refreshTrim(c){ // updates the trimmer UI in place (no re-render, keeps focus)
+  document.querySelectorAll(`[data-tl="${c.id}"]`).forEach(el=>{const d=cueDur(c);el.textContent=`Plays ${fmtP(cueLen(c))}${isFinite(d)?` of ${fmtP(d)}`:''}`});
+  document.querySelectorAll(`[data-tb="${c.id}"]`).forEach(el=>el.textContent=trimBadge(c));
+  document.querySelectorAll(`input[data-id="${c.id}"]`).forEach(i=>{if(i!==document.activeElement)i.value=i.dataset.a==='tin'?tIn(c):(c.trimEnd??'')});
+  document.querySelectorAll(`canvas[data-id="${c.id}"]`).forEach(drawWave);
+  fillStarts();
+}
+/* waveform peaks (decoded once per audio file) */
+const peakCache=new Map();let AC=null;
+function loadPeaks(c){
+  if(peakCache.has(c.id))return peakCache.get(c.id).p;
+  const e={};peakCache.set(c.id,e);
+  e.p=(async()=>{try{
+    AC??=new (window.AudioContext||window.webkitAudioContext)();
+    const ab=await AC.decodeAudioData(await (await fetch(c.src)).arrayBuffer());
+    const chs=[...Array(ab.numberOfChannels)].map((_,i)=>ab.getChannelData(i)),N=2000,step=chs[0].length/N,pk=new Float32Array(N);let mx=0;
+    for(let i=0;i<N;i++){let m=0;const a=Math.floor(i*step),b=Math.floor((i+1)*step),inc=Math.max(1,Math.floor((b-a)/300));
+      for(const ch of chs)for(let j=a;j<b;j+=inc){const v=Math.abs(ch[j]);if(v>m)m=v}pk[i]=m;if(m>mx)mx=m}
+    if(mx)for(let i=0;i<N;i++)pk[i]/=mx;
+    e.pk=pk;e.dur=ab.duration;durCache.set(c.id,ab.duration);
+  }catch(err){e.err=true}refreshTrim(c)})();
+  return e.p;
+}
+const cueOf=el=>project.scenes[+el.dataset.s]?.cues[+el.dataset.c];
+function drawWave(cv){
+  const c=cueOf(cv),W=cv.clientWidth,H=cv.clientHeight;if(!c||!W)return;
+  const dpr=devicePixelRatio||1;cv.width=W*dpr;cv.height=H*dpr;const g=cv.getContext('2d');g.scale(dpr,dpr);
+  const css=getComputedStyle(document.documentElement),v=n=>css.getPropertyValue(n).trim(),acc=v('--accent'),dim=v('--dim'),txt=v('--text');
+  const e=peakCache.get(c.id);
+  if(!e||!e.pk){g.fillStyle=dim;g.font='13px system-ui,sans-serif';
+    g.fillText(e&&e.err?'Waveform unavailable for this file (type start/end times below)':'Loading waveform…',10,H/2+4);if(!e)loadPeaks(c);return}
+  const d=e.dur,X=t=>t/d*W,x0=X(tIn(c)),x1=X(isFinite(tOut(c))?tOut(c):d);
+  for(let px=0;px<W;px++){const a=e.pk[Math.floor(px/W*e.pk.length)],h=Math.max(1,a*(H-22)),on=px>=x0&&px<=x1;
+    g.globalAlpha=on?1:.3;g.fillStyle=on?acc:dim;g.fillRect(px,(H-h)/2,1,h)}
+  g.globalAlpha=1;g.fillStyle='rgba(0,0,0,.35)';g.fillRect(0,0,x0,H);g.fillRect(x1,0,W-x1,H);
+  g.fillStyle=txt;g.font='bold 11px system-ui,sans-serif';
+  [[x0,fmtP(tIn(c)),1],[x1,fmtP(isFinite(tOut(c))?tOut(c):d),-1]].forEach(([x,lab,dir])=>{
+    g.fillRect(x-1,0,2,H);g.fillRect(dir>0?x:x-8,0,8,14);g.fillRect(dir>0?x:x-8,H-14,8,14);
+    const tw=g.measureText(lab).width;g.fillText(lab,Math.max(2,Math.min(W-tw-2,dir>0?x+11:x-11-tw)),12)});
+  if(previewAudio&&previewAudio._cue===c){g.fillStyle=v('--ok');g.fillRect(X(previewAudio.currentTime)-1,0,2,H)}
+}
+addEventListener('resize',()=>document.querySelectorAll('canvas.wave').forEach(drawWave));
+function trimmerHTML(c,si,ci){const k=`data-s="${si}" data-c="${ci}" data-id="${c.id}"`;return `<div class="trimmer">
+  <canvas class="wave" ${k} title="Drag near an edge to trim the start or the end"></canvas>
+  <div class="trow">
+    <label>Start <input type="number" min="0" step="0.05" data-a="tin" ${k} value="${tIn(c)}"> s</label>
+    <button class="btn icon" data-a="tnudge" data-w="in" data-d="-0.1" ${k} title="Start 0.1 s earlier">−</button><button class="btn icon" data-a="tnudge" data-w="in" data-d="0.1" ${k} title="Start 0.1 s later">+</button>
+    <button class="btn" data-a="tplayStart" ${k} title="Play the trimmed cue">${ico('play')}From start</button>
+    <span class="tlen" data-tl="${c.id}"></span>
+    <button class="btn" data-a="tplayEnd" ${k} title="Hear the last 3 seconds before the end point">${ico('play')}Last 3 s</button>
+    <button class="btn icon" data-a="tnudge" data-w="out" data-d="-0.1" ${k} title="End 0.1 s earlier">−</button><button class="btn icon" data-a="tnudge" data-w="out" data-d="0.1" ${k} title="End 0.1 s later">+</button>
+    <label>End <input type="number" min="0" step="0.05" data-a="tout" ${k} value="${c.trimEnd??''}" placeholder="full"> s</label>
+    <button class="btn danger" data-a="treset" ${k} title="Remove the trim">Reset</button>
+  </div></div>`}
+function cueOffset(sc,k){let t=0;for(let i=0;i<k;i++){const d=cueLen(sc.cues[i]);if(isFinite(d))t+=d}return t}
 function fillStarts(){ // updates text only, never re-renders (keeps focus/tab order)
   document.querySelectorAll('#scenes .cstart').forEach(el=>{const[si,ci]=el.dataset.k.split('-').map(Number);
     const sc=project.scenes[si];if(sc)el.textContent='@'+cueOffset(sc,ci).toFixed(1)+'s'});
@@ -256,7 +336,8 @@ function render(){
   $('title').value=project.title||"";
   const box=$('scenes');
   if(!project.scenes.length){box.innerHTML='<div class="empty">No scenes yet. Select <b>Add scene</b> to start building the show.</div>';return}
-  queueMicrotask(fillStarts);
+  stopPreview();
+  queueMicrotask(()=>{fillStarts();project.scenes.forEach(s=>s.cues.forEach(c=>openTrim.has(c.id)&&refreshTrim(c)))});
   box.innerHTML=project.scenes.map((s,si)=>`
   <div class="scene">
     <button class="thumb" data-a="bg" data-s="${si}" style="background-image:${s.bg?`url(${s.bg})`:'none'}"><span>${ico('img')}${s.bg?'Change background':'Add background'}</span></button>
@@ -268,12 +349,14 @@ function render(){
         <button class="btn icon danger" data-a="del" data-s="${si}" title="Delete scene">${ico('x')}</button></div>
       ${s.cues.map((c,ci)=>`<div class="clip"><span class="n">${ci+1}.</span><small class="cstart" data-k="${si}-${ci}" title="Start time on the scene timeline"></small>
         <input type="text" data-a="cname" data-s="${si}" data-c="${ci}" value="${esc(c.name)}">
+        <small class="tbadge" data-tb="${c.id}">${trimBadge(c)}</small>
         <label class="auto"><input type="checkbox" data-a="auto" data-s="${si}" data-c="${ci}" ${c.auto?'checked':''}>auto</label>
         <button class="btn icon" data-a="prev" data-s="${si}" data-c="${ci}" title="Preview">${ico('play')}</button>
+        <button class="btn icon ${openTrim.has(c.id)?'on':''}" data-a="trim" data-s="${si}" data-c="${ci}" title="Trim start / end">${ico('cut')}</button>
         <button class="btn icon" data-a="swap" data-s="${si}" data-c="${ci}" title="Replace audio file">${ico('swap')}</button>
         <button class="btn icon" data-a="cup" data-s="${si}" data-c="${ci}" title="Move up">${ico('up')}</button>
         <button class="btn icon" data-a="cdown" data-s="${si}" data-c="${ci}" title="Move down">${ico('down')}</button>
-        <button class="btn icon danger" data-a="cdel" data-s="${si}" data-c="${ci}" title="Remove cue">${ico('x')}</button></div>`).join('')}
+        <button class="btn icon danger" data-a="cdel" data-s="${si}" data-c="${ci}" title="Remove cue">${ico('x')}</button></div>${openTrim.has(c.id)?trimmerHTML(c,si,ci):''}`).join('')}
       <div class="frames">
         <div class="lbl"><span>Background timeline — locked to this scene's audio. Times count through the cues back-to-back (cue start times shown above), so seeking, skipping or pausing the audio moves the images with it</span></div>
         ${s.bg?`<div class="frame"><div class="ft" style="background-image:url(${s.bg})"></div>
@@ -294,7 +377,20 @@ function render(){
     </div>
   </div>`).join('');
 }
-let previewAudio=null;
+let previewAudio=null;const openTrim=new Set();
+function stopPreview(){const a=previewAudio;if(!a)return;previewAudio=null;a.pause();
+  a._btn.classList.remove('on');a._btn.querySelector('use')?.setAttribute('href','#i-play');
+  document.querySelectorAll(`canvas[data-id="${a._cue.id}"]`).forEach(drawWave)}
+function previewRange(c,from,to,btn,k){ // plays c from..to (respects the trim)
+  const same=previewAudio&&previewAudio._k===k;stopPreview();if(same)return;
+  const a=new Audio(c.src);Object.assign(a,{_k:k,_btn:btn,_cue:c,_to:to});previewAudio=a;
+  btn.classList.add('on');btn.querySelector('use')?.setAttribute('href','#i-stop');
+  const start=()=>{a.currentTime=from||0;a.play()};a.readyState>=1?start():a.addEventListener('loadedmetadata',start,{once:true});
+  a.onended=()=>previewAudio===a&&stopPreview();
+  const loop=()=>{if(previewAudio!==a)return;if(isFinite(a._to)&&a.currentTime>=a._to)return stopPreview();
+    document.querySelectorAll(`canvas[data-id="${c.id}"]`).forEach(drawWave);requestAnimationFrame(loop)};
+  requestAnimationFrame(loop);
+}
 $('scenes').addEventListener('click',async e=>{
   const t=e.target.closest('[data-a]');if(!t||t.tagName==='INPUT')return;
   const s=+t.dataset.s,c=+t.dataset.c,sc=project.scenes[s],a=t.dataset.a;
@@ -308,13 +404,13 @@ $('scenes').addEventListener('click',async e=>{
   else if(a==='cdel')sc.cues.splice(c,1);
   else if(a==='addFrames'){const fs=await pick('image/*',true);sc.frames??=[];for(const f of fs){const last=Math.max(sc.bgAt||0,...sc.frames.map(x=>x.at));sc.frames.push({src:await readURL(f),at:+(last+5).toFixed(1)})}}
   else if(a==='fdel'){sc.frames.splice(+t.dataset.f,1)}
-  else if(a==='swap'){const[f]=await pick('audio/*');if(!f)return;sc.cues[c].src=await readURL(f);durCache.delete(sc.cues[c].id)}
-  else if(a==='prev'){
-    const k=s+'-'+c,same=previewAudio&&previewAudio._k===k;
-    if(previewAudio){previewAudio.pause();previewAudio._btn.innerHTML=ico('play');previewAudio=null}
-    if(same)return;
-    previewAudio=new Audio(sc.cues[c].src);previewAudio._k=k;previewAudio._btn=t;t.innerHTML=ico('pause');
-    previewAudio.onended=()=>{t.innerHTML=ico('play');previewAudio=null};previewAudio.play();return}
+  else if(a==='swap'){const[f]=await pick('audio/*');if(!f)return;const q=sc.cues[c];q.src=await readURL(f);durCache.delete(q.id);peakCache.delete(q.id);delete q.trimStart;delete q.trimEnd}
+  else if(a==='prev'){const q=sc.cues[c];previewRange(q,tIn(q),tOut(q),t,'p'+q.id);return}
+  else if(a==='trim'){const id=sc.cues[c].id;openTrim.has(id)?openTrim.delete(id):openTrim.add(id);render();return}
+  else if(a==='tnudge'){const q=sc.cues[c],w=t.dataset.w,cur=w==='in'?tIn(q):tOut(q);if(isFinite(cur))setTrim(q,w,cur+ +t.dataset.d);return}
+  else if(a==='tplayStart'){const q=sc.cues[c];previewRange(q,tIn(q),tOut(q),t,'s'+q.id);return}
+  else if(a==='tplayEnd'){const q=sc.cues[c],o=tOut(q);if(!isFinite(o))return;previewRange(q,Math.max(tIn(q),o-3),o,t,'e'+q.id);return}
+  else if(a==='treset'){const q=sc.cues[c];delete q.trimStart;delete q.trimEnd;markDirty();refreshTrim(q);return}
   markDirty();render();
 });
 $('scenes').addEventListener('input',e=>{ // model-only update: keeps focus and tab order
@@ -326,7 +422,16 @@ $('scenes').addEventListener('input',e=>{ // model-only update: keeps focus and 
   if(a==='bgAt')project.scenes[s].bgAt=Math.max(0,+t.value||0);
   if(a==='fat')project.scenes[s].frames[+t.dataset.f].at=Math.max(0,+t.value||0);
   if(a==='before')project.scenes[s].before=t.value;
+  if(a==='tin'||a==='tout')return setTrim(project.scenes[s].cues[c],a==='tin'?'in':'out',t.value);
   markDirty();
+});
+$('scenes').addEventListener('pointerdown',e=>{
+  const cv=e.target.closest('canvas.wave');if(!cv)return;const c=cueOf(cv),pe=peakCache.get(c.id);if(!pe||!pe.dur)return;
+  const r=cv.getBoundingClientRect(),tAt=ev=>Math.max(0,Math.min(pe.dur,(ev.clientX-r.left)/r.width*pe.dur));
+  const t=tAt(e),o=isFinite(tOut(c))?tOut(c):pe.dur,w=Math.abs(t-tIn(c))<=Math.abs(t-o)?'in':'out';
+  cv.setPointerCapture(e.pointerId);setTrim(c,w,t);
+  const mv=ev=>setTrim(c,w,tAt(ev)),up=()=>{cv.removeEventListener('pointermove',mv);cv.removeEventListener('pointerup',up);cv.removeEventListener('pointercancel',up)};
+  cv.addEventListener('pointermove',mv);cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 });
 $('title').oninput=e=>{project.title=e.target.value;markDirty()};
 $('addScene').onclick=()=>{project.scenes.push({id:uid(),name:`Scene ${project.scenes.length+1}`,bg:null,cues:[]});markDirty();render()};
@@ -337,7 +442,7 @@ const types=[{description:'Skit project',accept:{'application/json':['.json']}}]
 function fileUI(){$('fileState').innerHTML=(F.name?esc(F.name):'Unsaved show')+(F.dirty?' <b>● unsaved changes</b>':'');
   document.title=(F.dirty?'● ':'')+(project.title||'Skit Cue Player')}
 function markDirty(){F.dirty=true;fileUI()}
-const json=()=>JSON.stringify({format:"skit-cue-player",version:1,...project});
+const json=()=>JSON.stringify({format:"skit-cue-player",version:2,...project});
 const defName=()=>(project.title||'skit').replace(/[^\w-]+/g,'_')+'.json';
 async function save(asNew){
   try{
@@ -485,7 +590,8 @@ function gotoScene(i){if(i<0||i>=project.scenes.length)return;stopAudio();P.s=i;
    scene time = full length of every cue before the current one + current cue's playhead.
    Seek, skip, pause, jump between cues -> images follow exactly. Tied to one scene only. */
 const timeline=sc=>sc?[...(sc.bg?[{src:sc.bg,at:sc.bgAt||0}]:[]),...(sc.frames||[])].sort((a,b)=>a.at-b.at):[];
-function sceneTime(){const sc=scene();return cueOffset(sc,P.c)+(P.audio&&isFinite(P.audio.currentTime)?P.audio.currentTime:0)}
+const cuePos=a=>a&&isFinite(a.currentTime)?Math.max(0,a.currentTime-tIn(a._cue)):0; // playhead inside the trimmed cue
+function sceneTime(){const sc=scene();return cueOffset(sc,P.c)+cuePos(P.audio)}
 function startSlides(){P.slideScene=P.s;P.shown=-2;scene().cues.forEach(cueDur);slideTick()}
 function stopSlides(){P.slideScene=-1}
 function slideTick(){
@@ -506,10 +612,25 @@ function playCue(){
   const sc=scene();
   if(P.c>=sc.cues.length){if(P.s<project.scenes.length-1)gotoScene(P.s+1);return}
   stopAudio();
-  const a=new Audio(sc.cues[P.c].src);a.volume=+$('vol').value;P.audio=a;
-  a.onended=()=>{const real=isFinite(a.duration)?a.duration:a.currentTime;if(real>0)durCache.set(sc.cues[P.c].id,real);P.audio=null;P.c++;ui();const n=scene().cues[P.c];if(n&&n.auto)playCue()};
-  a.onplay=a.onpause=ui;a.play();ui();
+  const c=sc.cues[P.c],a=new Audio(c.src);a.volume=+$('vol').value;a._cue=c;P.audio=a;
+  a.onended=()=>cueEnded(a);
+  a.onplay=a.onpause=ui;
+  const start=()=>{if(P.audio!==a)return;if(tIn(c))a.currentTime=tIn(c);a.play()};
+  a.readyState>=1?start():a.addEventListener('loadedmetadata',start,{once:true});ui();
 }
+function cueEnded(a){
+  if(P.audio!==a)return;const c=a._cue;
+  if(isFinite(a.duration)&&a.duration>0)durCache.set(c.id,a.duration);
+  else if(!c.trimEnd&&a.currentTime>0)durCache.set(c.id,a.currentTime);
+  a.onended=a.onpause=null;a.pause();P.audio=null;P.c++;ui();const n=scene().cues[P.c];if(n&&n.auto)playCue();
+}
+setInterval(()=>{const a=P.audio;if(a&&!a.paused&&a._cue.trimEnd>0&&a.currentTime>=a._cue.trimEnd)cueEnded(a)},20); // stop at the trimmed end
+function trimHere(w){
+  const a=P.audio;if(!a){flash('Play a cue first, then press at the exact spot');return}
+  const c=a._cue;setTrim(c,w,a.currentTime);
+  flash(w==='in'?`“${c.name}” now starts at ${fmtP(tIn(c))}`:`“${c.name}” now ends at ${fmtP(tOut(c))}`);ui();
+}
+let flashT;function flash(m){$('msg').textContent=m;clearTimeout(flashT);flashT=setTimeout(()=>$('msg').textContent='',3500)}
 function go(){if(P.audio){P.audio.paused?P.audio.play():P.audio.pause();return}playCue()}
 function stepCue(d){const n=P.c+d;if(n<0||n>scene().cues.length)return;stopAudio();P.c=n;ui()}
 function ui(){
@@ -525,24 +646,25 @@ function ui(){
   $('go').innerHTML=`${ico(ic)}<span>${txt}</span>`;
   $('nextCap').textContent=ns?`Next scene: ${ns.name}`:'Last scene';
   $('nextThumb').style.backgroundImage=ns&&ns.bg?`url(${ns.bg})`:'none';
-  $('cueList').innerHTML=sc.cues.length?sc.cues.map((c,i)=>`<button class="cue ${i<P.c?'done':''} ${i===P.c?'cur':''}" data-i="${i}"><span class="n">${i+1}.</span><small class="cstart">@${cueOffset(sc,i).toFixed(1)}s</small>${esc(c.name)}${c.auto?'<small>auto</small>':''}</button>`).join(''):'<div class="help" style="padding:10px">This scene has no audio.</div>';
+  $('cueList').innerHTML=sc.cues.length?sc.cues.map((c,i)=>`<button class="cue ${i<P.c?'done':''} ${i===P.c?'cur':''}" data-i="${i}"><span class="n">${i+1}.</span><small class="cstart">@${cueOffset(sc,i).toFixed(1)}s</small>${esc(c.name)}${c.trimStart||c.trimEnd?' <small class="tbadge" style="margin:0">✂</small>':''}${c.auto?'<small>auto</small>':''}</button>`).join(''):'<div class="help" style="padding:10px">This scene has no audio.</div>';
   $('cueList').querySelector('.cur')?.scrollIntoView({block:'nearest'});
 }
 $('cueList').onclick=e=>{const b=e.target.closest('.cue');if(!b)return;stopAudio();P.c=+b.dataset.i;ui();b.blur()};
-setInterval(()=>{const a=P.audio;$('bar').firstElementChild.style.width=a&&a.duration?(a.currentTime/a.duration*100)+'%':'0';
-  $('tCur').textContent=fmt(a?a.currentTime:0);$('tDur').textContent=fmt(a?a.duration:0)},100);
+setInterval(()=>{const a=P.audio,L=a?cueLen(a._cue):0,pos=cuePos(a);$('bar').firstElementChild.style.width=L>0?Math.min(100,pos/L*100)+'%':'0';
+  $('tCur').textContent=fmt(pos);$('tDur').textContent=fmt(L)},100);
 
 /* ---------- SEEK ---------- */
-function seekTo(t){const a=P.audio;if(!a||!isFinite(a.duration))return;a.currentTime=Math.max(0,Math.min(a.duration-0.05,t))}
-function skip(d){if(P.audio)seekTo(P.audio.currentTime+d)}
+function seekTo(t){const a=P.audio,L=a?cueLen(a._cue):NaN;if(!isFinite(L))return;a.currentTime=tIn(a._cue)+Math.max(0,Math.min(L-0.05,t))} // t = seconds into the trimmed cue
+function skip(d){if(P.audio)seekTo(cuePos(P.audio)+d)}
 (()=>{const bar=$('bar');let drag=false;
-  const at=e=>{const r=bar.getBoundingClientRect(),a=P.audio;if(a&&isFinite(a.duration))seekTo((e.clientX-r.left)/r.width*a.duration)};
+  const at=e=>{const r=bar.getBoundingClientRect(),a=P.audio,L=a?cueLen(a._cue):NaN;if(isFinite(L))seekTo((e.clientX-r.left)/r.width*L)};
   bar.addEventListener('pointerdown',e=>{if(!P.audio)return;drag=true;bar.setPointerCapture(e.pointerId);bar.classList.add('seeking');at(e)});
   bar.addEventListener('pointermove',e=>{if(drag)at(e)});
   const end=()=>{drag=false;bar.classList.remove('seeking')};
   bar.addEventListener('pointerup',end);bar.addEventListener('pointercancel',end);
 })();
 $('pBack').onclick=()=>skip(-5);
+$('pIn').onclick=()=>trimHere('in');$('pOut').onclick=()=>trimHere('out');
 $('pFwd').onclick=()=>skip(5);
 
 /* ---------- DIM ---------- */
@@ -555,7 +677,7 @@ $('pDim').onclick=e=>setDim(e.shiftKey?dimI-1:(dimI+1)%DIM.length);
 /* ---------- MODE SWITCH ---------- */
 $('toPlayer').onclick=()=>{
   if(!project.scenes.length){alert('Add at least one scene before playing.');return}
-  if(previewAudio){previewAudio.pause();previewAudio=null}
+  stopPreview();
   $('editor').style.display='none';$('player').style.display='flex';
   stopSlides();P.s=0;P.c=0;P.blank=true;toggleBlank();$('bgA').style.opacity=0;$('bgB').style.opacity=0;P.bg=null;syncAud();startSlides();setDim(0);ui();audUI();
 };
@@ -580,7 +702,7 @@ function presenterKey(e){
     k===','||k==='.'?()=>skip(k===','?-1:1):
     l==='d'?()=>setDim(e.shiftKey?dimI-1:dimI+1):
     ({' ':go,'Escape':()=>{stopAudio();ui()},'ArrowLeft':()=>stepCue(-1),'ArrowRight':()=>stepCue(1),
-      'PageUp':()=>gotoScene(P.s-1),'PageDown':()=>gotoScene(P.s+1),'b':blackout,'k':toggleBlank,'t':toggleTheme,'a':openAudience})[l];
+      'PageUp':()=>gotoScene(P.s-1),'PageDown':()=>gotoScene(P.s+1),'b':blackout,'k':toggleBlank,'t':toggleTheme,'a':openAudience,'[':()=>trimHere('in'),']':()=>trimHere('out')})[l];
   if(act){e.preventDefault();act()}
 }
 window.presenterKey=presenterKey;
