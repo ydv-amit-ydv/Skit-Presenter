@@ -60,6 +60,48 @@ select{background:var(--bg);color:var(--text);border:1px solid var(--line);borde
 .tbadge{font-size:.72rem;color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums}
 .btn.on{border-color:var(--accent);color:var(--accent)}
 #msg{color:var(--accent);font-weight:600}
+/* Phone remote: pairing dialog (laptop) */
+#remoteDlg{border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--text);padding:0;max-width:440px;width:calc(100% - 32px);box-shadow:var(--shadow)}
+#remoteDlg::backdrop{background:rgba(0,0,0,.6)}
+.rd{padding:20px;display:flex;flex-direction:column;gap:12px;text-align:center}
+.rd h3{margin:0;display:flex;gap:8px;align-items:center;justify-content:center}
+.rd .help{margin:0;text-align:left}
+#rdQR{background:#fff;border-radius:12px;padding:10px;width:240px;height:240px;margin:0 auto;display:grid;place-items:center;color:#333;font-size:.85rem}
+#rdQR svg{width:100%;height:100%}
+#rdCode{font-size:2rem;font-weight:800;letter-spacing:.25em;font-variant-numeric:tabular-nums}
+#rdLink{color:var(--accent);word-break:break-all;font-size:.85rem}
+#rdUrlRow{text-align:left;font-size:.85rem;color:var(--dim);display:flex;flex-direction:column;gap:4px}
+#rdStatus{margin:0;font-weight:600}
+#rdStatus.err{color:var(--danger)}
+.rd .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+#pRemote.on{border-color:var(--ok);color:var(--ok)}
+/* Phone remote: the phone's screen */
+#remote{display:none;max-width:560px;margin:0 auto;padding:12px 14px 40px;min-height:100vh}
+.rtop{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:.9rem;color:var(--dim)}
+.rtop b{color:var(--text);font-size:1.05rem;margin-right:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#rThumb{aspect-ratio:16/9;background:#000 center/contain no-repeat;border-radius:12px;border:1px solid var(--line);position:relative;overflow:hidden}
+#rThumb.blank::after{content:"AUDIENCE BLANK";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-weight:800;letter-spacing:.15em;background:repeating-linear-gradient(45deg,#000 0 14px,#111 14px 28px)}
+#rScene{color:var(--dim);font-size:.9rem;margin-top:10px}
+#rCue{font-size:1.3rem;font-weight:700;margin:4px 0;display:flex;gap:8px;align-items:center}
+#rNext{color:var(--dim);font-size:.9rem}
+#rProg{display:flex;align-items:center;gap:10px;margin-top:10px;font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--dim)}
+#rBar{flex:1;height:30px;display:flex;align-items:center;position:relative;touch-action:none}
+#rBar::before{content:"";position:absolute;left:0;right:0;height:10px;background:var(--panel2);border-radius:5px}
+#rBar div{position:relative;height:10px;width:0;background:var(--accent);border-radius:5px}
+#rGo{width:100%;justify-content:center;font-size:1.7rem;padding:24px;border-radius:18px;margin-top:12px}
+#rGo svg{width:28px;height:28px}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.rgrid.two{grid-template-columns:1fr 1fr}
+.rgrid .btn{justify-content:center;padding:14px 6px;min-height:56px;font-size:.95rem;touch-action:manipulation}
+.rgrid .btn svg{width:22px;height:22px}
+.rgrid .btn.on{background:var(--danger);border-color:var(--danger);color:#fff}
+.rsec{margin-top:16px;font-size:.8rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+#rCues{margin-top:6px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px}
+#rVol{width:100%;accent-color:var(--accent);margin-top:6px}
+#rConnect[hidden]{display:none}
+#rConnect{display:flex;flex-direction:column;gap:12px;margin-top:30px;text-align:center}
+#rConnect input{font-size:1.6rem;text-align:center;letter-spacing:.25em;text-transform:uppercase;padding:12px}
+#rMain.off{opacity:.45;pointer-events:none}
 .empty{color:var(--dim);text-align:center;padding:60px 20px;border:2px dashed var(--line);border-radius:14px}
 @media(max-width:680px){.scene{grid-template-columns:1fr}}
 /* Presenter console */
@@ -142,6 +184,7 @@ kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2p
  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
  <symbol id="i-dim" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor"/></symbol>
 <symbol id="i-cut" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></symbol>
+ <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></symbol>
  <symbol id="i-mask" viewBox="0 0 24 24"><path d="M3 5c3 1 6 1 9 0s6-1 9 0v5c0 6-4 10-9 10S3 16 3 10Z"/><path d="M8 10h2M14 10h2M9 15c2 1.5 4 1.5 6 0"/></symbol>
 </svg>
 
@@ -170,6 +213,7 @@ kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2p
     <h2><svg><use href="#i-mask"/></svg><span id="pTitle">Presenter view</span></h2>
     <span id="audState"></span>
     <button class="btn primary" id="pAud" title="Open the audience window (A)"><svg><use href="#i-full"/></svg><span>Open audience screen</span></button>
+    <button class="btn" id="pRemote" title="Control the show from a phone (R)"><svg><use href="#i-phone"/></svg><span>Phone remote</span></button>
     <button class="btn" id="pBlank" title="Blank the audience screen (K)"><svg><use href="#i-eye"/></svg><span>Blank audience</span></button>
     <button class="btn icon themeBtn" title="Switch light/dark (T)"><svg><use href="#i-sun"/></svg></button>
     <button class="btn" id="pExit" title="Back to editor"><svg><use href="#i-edit"/></svg>Editor</button>
@@ -209,9 +253,22 @@ kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2p
         <label class="vol" title="Volume"><svg><use href="#i-vol"/></svg><input type="range" id="vol" min="0" max="1" step="0.05" value="1"></label>
       </div>
     </div>
-    <div class="keys"><kbd>Space</kbd> GO/pause &nbsp; <kbd>Esc</kbd> stop &nbsp; <kbd>←</kbd><kbd>→</kbd> cue &nbsp; <kbd>Shift</kbd>+<kbd>←</kbd><kbd>→</kbd> ±5s &nbsp; <kbd>,</kbd><kbd>.</kbd> ±1s &nbsp; <kbd>PgUp</kbd><kbd>PgDn</kbd> scene &nbsp; <kbd>D</kbd> dim &nbsp; <kbd>B</kbd> blackout &nbsp; <kbd>A</kbd> audience screen &nbsp; <kbd>K</kbd> blank audience &nbsp; <kbd>[</kbd><kbd>]</kbd> trim in/out here &nbsp; <kbd>Ctrl</kbd>+<kbd>S</kbd> save</div>
+    <div class="keys"><kbd>Space</kbd> GO/pause &nbsp; <kbd>Esc</kbd> stop &nbsp; <kbd>←</kbd><kbd>→</kbd> cue &nbsp; <kbd>Shift</kbd>+<kbd>←</kbd><kbd>→</kbd> ±5s &nbsp; <kbd>,</kbd><kbd>.</kbd> ±1s &nbsp; <kbd>PgUp</kbd><kbd>PgDn</kbd> scene &nbsp; <kbd>D</kbd> dim &nbsp; <kbd>B</kbd> blackout &nbsp; <kbd>A</kbd> audience screen &nbsp; <kbd>K</kbd> blank audience &nbsp; <kbd>[</kbd><kbd>]</kbd> trim in/out here &nbsp; <kbd>R</kbd> phone remote &nbsp; <kbd>Ctrl</kbd>+<kbd>S</kbd> save</div>
   </div>
 </section>
+<dialog id="remoteDlg"><div class="rd">
+  <h3><svg><use href="#i-phone"/></svg>Phone remote</h3>
+  <p class="help">Scan this with your phone's camera. The phone becomes a remote for the show; this laptop still plays the sound and drives the audience screen. Both devices need internet to pair.</p>
+  <div id="rdQR">Starting…</div>
+  <div>Or open the link on the phone and enter <b>code</b>:</div>
+  <div id="rdCode">······</div>
+  <a id="rdLink" target="_blank" rel="noopener"></a>
+  <label id="rdUrlRow" hidden>Online address of the remote page (this file is opened from your computer, so the phone needs an online copy of it, for example this repo's GitHub Pages site)
+    <input type="text" id="rdUrl"></label>
+  <p id="rdStatus"></p>
+  <div class="row"><button class="btn danger" id="rdStop">Turn off remote</button><button class="btn primary" id="rdClose" autofocus>Done</button></div>
+</div></dialog>
+<section id="remote"></section>
 
 <script>
 let project={title:"",scenes:[]};
@@ -695,19 +752,168 @@ document.querySelectorAll('#player .btn').forEach(b=>b.addEventListener('mouseup
 
 /* ---------- KEYS (also forwarded from the audience window) ---------- */
 function presenterKey(e){
-  if($('player').style.display!=='flex')return;
+  if($('player').style.display!=='flex'||$('remoteDlg').open)return;
   const k=e.key,l=k.length===1?k.toLowerCase():k;
   const act=
     e.shiftKey&&(k==='ArrowLeft'||k==='ArrowRight')?()=>skip(k==='ArrowLeft'?-5:5):
     k===','||k==='.'?()=>skip(k===','?-1:1):
     l==='d'?()=>setDim(e.shiftKey?dimI-1:dimI+1):
     ({' ':go,'Escape':()=>{stopAudio();ui()},'ArrowLeft':()=>stepCue(-1),'ArrowRight':()=>stepCue(1),
-      'PageUp':()=>gotoScene(P.s-1),'PageDown':()=>gotoScene(P.s+1),'b':blackout,'k':toggleBlank,'t':toggleTheme,'a':openAudience,'[':()=>trimHere('in'),']':()=>trimHere('out')})[l];
+      'PageUp':()=>gotoScene(P.s-1),'PageDown':()=>gotoScene(P.s+1),'b':blackout,'k':toggleBlank,'t':toggleTheme,'a':openAudience,'[':()=>trimHere('in'),']':()=>trimHere('out'),'r':openRemoteDlg})[l];
   if(act){e.preventDefault();act()}
 }
 window.presenterKey=presenterKey;
 document.addEventListener('keydown',e=>{if(e.target.type==='range'||e.target.type==='text')return;presenterKey(e)});
-render();
+/* ---------- PHONE REMOTE (WebRTC via PeerJS; loaded only when used) ---------- */
+const PEERJS='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js';
+const QRJS='https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
+const PEER_PREFIX='skitcue-';
+const DEFAULT_REMOTE_URL='https://ydv-amit-ydv.github.io/Skit-Presenter/skit-cue-player.html';
+const peerOpts=()=>window.PEER_OPTS||{}; // override (e.g. own PeerJS server) by defining window.PEER_OPTS
+function loadJS(src,ready){return ready()?Promise.resolve():new Promise((res,rej)=>{const el=document.createElement('script');el.src=src;
+  el.onload=res;el.onerror=()=>{el.remove();rej(new Error('Could not load the remote library. Is this device online?'))};document.head.appendChild(el)})}
+const store={get:k=>{try{return localStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}};
+function newCode(){const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';return Array.from(crypto.getRandomValues(new Uint8Array(6)),b=>A[b%A.length]).join('')}
+
+/* laptop side: hosts the connection, obeys commands, streams state */
+const RM={peer:null,code:store.get('scp-remote-code')||newCode(),conns:new Set(),last:'',thumbFor:undefined,thumb:null,tries:0};
+const isHttp=/^https?:$/.test(location.protocol);
+const remoteBase=()=>isHttp?location.href.split('#')[0]:(store.get('scp-remote-url')||DEFAULT_REMOTE_URL);
+const remoteLink=()=>`${remoteBase()}#remote=${RM.code}`;
+function rdStatus(t,err){$('rdStatus').textContent=t;$('rdStatus').classList.toggle('err',!!err)}
+function remUI(){const n=RM.conns.size,on=!!RM.peer;$('pRemote').classList.toggle('on',n>0);
+  $('pRemote').querySelector('span').textContent=n?`Phone connected${n>1?` (${n})`:''}`:on?'Phone remote (waiting)':'Phone remote';
+  if(on&&RM.peer.open)rdStatus(n?`✓ ${n} phone${n>1?'s':''} connected — you can close this box`:'Waiting for the phone to connect…')}
+async function showQR(){
+  const link=remoteLink();$('rdCode').textContent=RM.code;$('rdLink').textContent=link;$('rdLink').href=link;
+  $('rdUrlRow').hidden=isHttp;$('rdUrl').value=remoteBase();
+  try{await loadJS(QRJS,()=>window.qrcode);const q=qrcode(0,'M');q.addData(link);q.make();$('rdQR').innerHTML=q.createSvgTag({cellSize:4,margin:2,scalable:true})}
+  catch(e){$('rdQR').textContent='QR code needs internet — type the link and code on the phone instead.'}
+}
+async function startRemote(){
+  if(RM.peer)return;
+  rdStatus('Connecting to the pairing service…');showQR();
+  try{await loadJS(PEERJS,()=>window.Peer)}catch(e){rdStatus(e.message,true);return}
+  store.set('scp-remote-code',RM.code);
+  const peer=new Peer(PEER_PREFIX+RM.code.toLowerCase(),peerOpts());RM.peer=peer;
+  peer.on('open',()=>{RM.tries=0;remUI()});
+  peer.on('error',e=>{
+    if(e.type==='unavailable-id'){ // the code is still held (e.g. right after a reload): retry, then pick a new one
+      peer.destroy();RM.peer=null;if(++RM.tries>3){RM.code=newCode();RM.tries=0}
+      rdStatus('Reconnecting…');setTimeout(startRemote,2500);return}
+    if(e.type==='peer-unavailable')return;
+    rdStatus('Remote problem: '+(e.type||e.message)+(/network|server|socket/.test(e.type)?' — check the internet connection':''),true)});
+  peer.on('disconnected',()=>{if(!peer.destroyed)setTimeout(()=>{try{peer.reconnect()}catch{}},2000)});
+  peer.on('connection',conn=>{
+    conn.on('open',()=>{RM.conns.add(conn);RM.last='';sendState();sendThumb(conn);remUI();flash('📱 Phone remote connected')});
+    conn.on('data',onRemoteCmd);
+    const gone=()=>{if(RM.conns.delete(conn)){remUI();flash('📱 Phone remote disconnected')}};
+    conn.on('close',gone);conn.on('error',gone);
+  });
+}
+function stopRemote(){if(RM.peer){RM.peer.destroy();RM.peer=null}RM.conns.clear();remUI();rdStatus('Remote is off.')}
+function openRemoteDlg(){if(!$('remoteDlg').open)$('remoteDlg').showModal();startRemote();remUI()}
+$('pRemote').onclick=openRemoteDlg;
+$('rdClose').onclick=()=>$('remoteDlg').close();
+$('rdStop').onclick=()=>{stopRemote();$('remoteDlg').close()};
+$('rdUrl').onchange=e=>{store.set('scp-remote-url',e.target.value.trim()||DEFAULT_REMOTE_URL);showQR()};
+function remoteState(){
+  const sc=scene(),a=P.audio;
+  if($('player').style.display!=='flex'||!sc)return{t:'state',ready:false,title:project.title||''};
+  return{t:'state',ready:true,title:project.title||'Show',s:P.s,ns:project.scenes.length,scene:sc.name,c:P.c,
+    cue:$('cueInfo').textContent,next:$('nextInfo').textContent,go:$('go').textContent,
+    playing:!!a&&!a.paused,paused:!!a&&a.paused,pos:+cuePos(a).toFixed(1),len:a&&isFinite(cueLen(a._cue))?+cueLen(a._cue).toFixed(1):0,
+    cues:sc.cues.map(c=>({n:c.name,auto:!!c.auto})),dim:DIM[dimI],blank:!!P.blank,aud:!!aud&&!aud.closed,vol:+$('vol').value};
+}
+function sendState(){if(!RM.conns.size)return;const st=remoteState(),j=JSON.stringify(st);if(j===RM.last)return;RM.last=j;
+  RM.conns.forEach(c=>{try{c.open&&c.send(st)}catch{}})}
+function sendThumb(only){const m={t:'thumb',img:RM.thumb};(only?[only]:[...RM.conns]).forEach(c=>{try{c.open&&c.send(m)}catch{}})}
+function makeThumb(src){return new Promise(res=>{if(!src)return res(null);const im=new Image();im.onload=()=>{
+  const w=Math.min(480,im.naturalWidth||480),cv=document.createElement('canvas');cv.width=w;cv.height=Math.round(w*(im.naturalHeight||270)/(im.naturalWidth||480));
+  cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);res(cv.toDataURL('image/jpeg',.6))};im.onerror=()=>res(null);im.src=src})}
+setInterval(async()=>{if(!RM.conns.size)return;sendState();
+  const src=$('player').style.display==='flex'?P.bg:null;
+  if(src!==RM.thumbFor){RM.thumbFor=src;const t=await makeThumb(src);if(RM.thumbFor===src){RM.thumb=t;sendThumb()}}},250);
+function onRemoteCmd(d){
+  if(!d||typeof d.cmd!=='string'||$('player').style.display!=='flex')return;
+  const acts={go,stop:()=>{stopAudio();ui()},prevCue:()=>stepCue(-1),nextCue:()=>stepCue(1),prevScene:()=>gotoScene(P.s-1),nextScene:()=>gotoScene(P.s+1),
+    back:()=>skip(-5),fwd:()=>skip(5),dim:()=>setDim(dimI+1),undim:()=>setDim(dimI-1),blackout,blank:toggleBlank,
+    in:()=>trimHere('in'),out:()=>trimHere('out'),
+    jump:()=>{const i=d.v|0;if(i>=0&&i<scene().cues.length){stopAudio();P.c=i;ui()}},
+    seek:()=>{const a=P.audio;if(a&&isFinite(cueLen(a._cue)))seekTo(Math.max(0,Math.min(1,+d.v))*cueLen(a._cue))},
+    vol:()=>{const v=Math.max(0,Math.min(1,+d.v||0));$('vol').value=v;if(P.audio)P.audio.volume=v}};
+  if(acts[d.cmd]){acts[d.cmd]();sendState()}
+}
+
+/* phone side: the remote control screen */
+function runRemote(code){
+  document.title='Skit remote';$('editor').style.display='none';const R=$('remote');R.style.display='block';
+  R.innerHTML=`<div class="rtop"><b id="rTitle">Skit remote</b><span id="rConn"><span class="dot"></span> Not connected</span>
+      <button class="btn icon themeBtn" title="Light/dark">${ico('sun')}</button></div>
+    <div id="rConnect" ${code?'hidden':''}><p class="help" style="margin:0">Enter the code shown on the laptop (Presenter view → Phone remote).</p>
+      <input type="text" id="rCode" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="CODE">
+      <button class="btn primary" id="rJoin" style="justify-content:center">Connect</button></div>
+    <div id="rMain" class="off" ${code?'':'hidden'}>
+      <div id="rThumb"></div>
+      <div id="rScene"></div><div id="rCue"></div><div id="rNext"></div>
+      <div id="rProg"><span id="rCur">0:00</span><div id="rBar"><div></div></div><span id="rDur">0:00</span></div>
+      <button class="btn primary" id="rGo" data-r="go">${ico('play')}<span>GO</span></button>
+      <div class="rgrid"><button class="btn" data-r="prevCue">${ico('prev')}Cue</button><button class="btn danger" data-r="stop">${ico('stop')}Stop</button><button class="btn" data-r="nextCue">Cue${ico('next')}</button></div>
+      <div class="rgrid"><button class="btn" data-r="back">−5s</button><button class="btn" data-r="blank" id="rBlank">${ico('eye')}Blank</button><button class="btn" data-r="fwd">+5s</button></div>
+      <div class="rgrid"><button class="btn" data-r="prevScene">${ico('sprev')}Scene</button><button class="btn" data-r="dim" id="rDim">${ico('dim')}Dim</button><button class="btn" data-r="nextScene">Scene${ico('snext')}</button></div>
+      <div class="rgrid two"><button class="btn" data-r="undim">Brighter</button><button class="btn" data-r="blackout">Blackout</button></div>
+      <div class="rsec">Volume</div><input type="range" id="rVol" min="0" max="1" step="0.05" value="1">
+      <div class="rsec">Cues in this scene · tap to jump</div><div id="rCues"></div>
+      <div class="rsec">Trim the playing cue</div>
+      <div class="rgrid two"><button class="btn" data-r="in">[ Start here</button><button class="btn" data-r="out">End here ]</button></div>
+    </div>`;
+  R.querySelectorAll('.themeBtn').forEach(b=>b.onclick=toggleTheme);setTheme(document.documentElement.dataset.theme);
+  let peer=null,conn=null,st=null,timer=null,wake=null;
+  const setConn=(t,live)=>$('rConn').innerHTML=`<span class="dot ${live?'live':''}"></span> ${esc(t)}`;
+  const send=(cmd,v)=>{if(conn&&conn.open){conn.send({cmd,v});navigator.vibrate?.(12)}};
+  const keepAwake=async()=>{try{if(!wake&&document.visibilityState==='visible'&&navigator.wakeLock){wake=await navigator.wakeLock.request('screen');wake.onrelease=()=>wake=null}}catch{}};
+  document.addEventListener('visibilitychange',()=>{keepAwake();if(document.visibilityState==='visible'&&code&&!(conn&&conn.open))connect()});
+  R.addEventListener('click',e=>{keepAwake();const b=e.target.closest('[data-r]');if(b){send(b.dataset.r);b.blur()}
+    const c=e.target.closest('.cue');if(c)send('jump',+c.dataset.i)});
+  $('rVol').oninput=e=>send('vol',+e.target.value);
+  $('rBar').addEventListener('pointerdown',e=>{const r=$('rBar').getBoundingClientRect();send('seek',(e.clientX-r.left)/r.width)});
+  const join=()=>{const v=$('rCode').value.trim().toUpperCase();if(v.length<4)return;code=v;history.replaceState(null,'','#remote='+v);
+    $('rConnect').hidden=true;$('rMain').hidden=false;connect()};
+  $('rJoin').onclick=join;$('rCode').onkeydown=e=>{if(e.key==='Enter')join()};
+  function show(s){
+    st=s;$('rMain').classList.toggle('off',!s.ready);$('rTitle').textContent=s.title||'Skit remote';
+    if(!s.ready){$('rScene').textContent='';$('rCue').textContent='The laptop is in the editor — press Play show there.';$('rNext').textContent='';return}
+    $('rScene').textContent=`Scene ${s.s+1} of ${s.ns} · ${s.scene}${s.aud?'':' · audience screen not open'}`;
+    $('rCue').innerHTML=`<span class="dot ${s.playing?'live':s.paused?'paused':''}"></span>${esc(s.cue)}`;$('rNext').textContent=s.next;
+    const [ic,tx]=s.playing?['pause','Pause']:s.paused?['play','Resume']:['play',s.go||'GO'];$('rGo').innerHTML=`${ico(ic)}<span>${esc(tx)}</span>`;
+    $('rCur').textContent=fmt(s.pos);$('rDur').textContent=fmt(s.len);$('rBar').firstElementChild.style.width=s.len?Math.min(100,s.pos/s.len*100)+'%':'0';
+    $('rBlank').classList.toggle('on',s.blank);$('rBlank').lastChild.textContent=s.blank?'Unblank':'Blank';
+    $('rDim').lastChild.textContent=s.dim===100?'Blackout':s.dim?`Dim ${s.dim}%`:'Dim';
+    $('rThumb').classList.toggle('blank',s.blank);if(document.activeElement!==$('rVol'))$('rVol').value=s.vol;
+    const html=s.cues.length?s.cues.map((c,i)=>`<button class="cue ${i<s.c?'done':''} ${i===s.c?'cur':''}" data-i="${i}"><span class="n">${i+1}.</span>${esc(c.n)}${c.auto?'<small>auto</small>':''}</button>`).join(''):'<div class="help" style="padding:10px">This scene has no audio.</div>';
+    if($('rCues').dataset.h!==html){$('rCues').innerHTML=html;$('rCues').dataset.h=html}
+  }
+  function retry(msg){setConn(msg);$('rMain').classList.add('off');clearTimeout(timer);timer=setTimeout(connect,3000)}
+  async function connect(){
+    clearTimeout(timer);if(!code)return;setConn('Connecting…');
+    try{await loadJS(PEERJS,()=>window.Peer)}catch(e){return retry('Offline — retrying…')}
+    const go=()=>{try{conn&&conn.close()}catch{}
+      conn=peer.connect(PEER_PREFIX+code.toLowerCase(),{reliable:true});
+      conn.on('open',()=>{setConn('Connected',true);keepAwake()});
+      conn.on('data',m=>{if(m&&m.t==='state')show(m);else if(m&&m.t==='thumb')$('rThumb').style.backgroundImage=m.img?`url("${m.img}")`:'none'});
+      conn.on('close',()=>retry('Connection lost — retrying…'));};
+    if(peer&&!peer.destroyed&&peer.open)return go();
+    try{peer&&peer.destroy()}catch{}
+    peer=new Peer(undefined,peerOpts());
+    peer.on('open',go);
+    peer.on('error',e=>retry(e.type==='peer-unavailable'?`Show ${code} not found — is Phone remote on at the laptop? Retrying…`:'Connection problem — retrying…'));
+    peer.on('disconnected',()=>{if(!peer.destroyed)try{peer.reconnect()}catch{}});
+  }
+  connect();
+}
+
+const rm=location.hash.match(/^#remote(?:=([A-Za-z0-9]{4,8}))?/);
+if(rm)runRemote(rm[1]?rm[1].toUpperCase():'');else render();
 </script>
 </body>
 </html>
